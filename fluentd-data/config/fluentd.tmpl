@@ -1,0 +1,80 @@
+## File input
+## read docker logs with tag=docker.container
+
+{{range $key, $value := .}}{{ $logs := $value.Env.LOG }}{{ if $logs }}
+
+<source>
+  type tail
+  format json
+  time_key time
+  time_format %Y-%m-%dT%H:%M:%S.%N%Z
+  path /var/lib/docker/containers/{{ $value.ID }}/{{ $value.ID }}-json.log
+  pos_file /var/lib/docker/containers/{{ $value.ID }}/{{ $value.ID }}-json.log.pos
+  tag docker.container.{{printf "%.*s" 12 $value.ID}}
+  rotate_wait 5
+</source>
+
+<match docker.container.{{printf "%.*s" 12 $value.ID}}>
+  type docker_format
+  docker_containers_path /var/lib/docker/containers
+  container_id {{ $value.ID }}
+  tag docker.all
+</match>
+
+{{end}}{{ end }}
+
+<source>
+  type syslog
+  port 5140
+  bind 0.0.0.0
+  tag system
+</source>
+
+
+#<match docker.filtered.**>
+#  type exclude_filter
+#  key stream
+#  value stdout
+#  regexp false # default false, string comparison
+#  add_tag_prefix stderr
+#</match>
+
+<match docker.all>
+    type color_stripper
+    tag  docker.all.stripped
+    strip_fields log
+</match>
+
+<match system.nginx.*>
+    type parser
+    format nginx
+    tag  nginx.access
+    key_name message
+</match>
+
+<match docker.all.stripped>
+  type elasticsearch
+  host {{ .Env.ES_HOST }}
+  port {{ .Env.ES_PORT }}
+  index_name docker
+  type_name stripped
+  logstash_format true
+</match>
+
+<match system.**>
+  type elasticsearch
+  host {{ .Env.ES_HOST }}
+  port {{ .Env.ES_PORT }}
+  index_name syslog
+  type_name syslog
+  logstash_format true
+</match>
+
+<match **>
+  type elasticsearch
+  host {{ .Env.ES_HOST }}
+  port {{ .Env.ES_PORT }}
+  index_name docker
+  type_name fluentd
+  logstash_format true
+</match>

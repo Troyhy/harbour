@@ -8,14 +8,24 @@
 #
 
 nginx:
-  image: jwilder/nginx-proxy
+#  image: jwilder/nginx-proxy
+  build: ./nginx-proxy
   ports:
   - "80:80"
   volumes:
   - /var/run/docker.sock:/tmp/docker.sock
   environment:
   - LOG=true
+  links:
+  - fluentd
 
+logrotate:
+  build: ./logrotate
+  volumes:
+  - /var/run/docker.sock:/var/run/docker.sock
+  - /var/lib/docker:/var/lib/docker
+  environment:
+  - LOG=true
 
 kibana:
   image: ehazlett/kibana
@@ -39,11 +49,11 @@ elasticsearch:
 
 logstash:
   image: pblittle/docker-logstash
-  environment:
-  - ES_HOST=elasticsearch
-  - ES_PORT=9200
+#  environment:
+#  - ES_HOST=elasticsearch
+#  - ES_PORT=9200
   links:
-  - elasticsearch
+  - elasticsearch:es
   ports:
   - "9292:9292"
 
@@ -57,7 +67,7 @@ fluentd:
   volumes:
   - /var/run/docker.sock:/tmp/docker.sock
   - /var/lib/docker:/var/lib/docker 
-
+  - ./fluentd-data/config/fluentd.tmpl:/app/config/fluentd.tmpl
 # sudo docker run   -e ES_HOST=elasticsearch   -e ES_PORT=9200   -p 9292:9292  --link  Harbour_elasticsearch_1:elasticsearch  pblittle/docker-logstash 
 
 #elk:

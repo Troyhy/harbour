@@ -1,3 +1,9 @@
 [submodule "fluentd"]
 	path = fluentd
 	url = git@github.com:Troyhy/fluentd.git
+[submodule "nginx-proxy"]
+	path = nginx-proxy
+	url = git@github.com:Troyhy/nginx-proxy.git
+[submodule "logrotate"]
+	path = logrotate
+	url = git@github.com:Troyhy/logrotate.git
