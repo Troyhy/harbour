@@ -1,0 +1,90 @@
+#
+# ##docker 1.5 on ubuntu##
+# sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+#
+# sudo sh -c "echo deb https://get.docker.io/ubuntu docker main  > /etc/apt/sources.list.d/docker.list"
+# $ sudo apt-get update
+# $ sudo apt-get install lxc-docker
+#
+
+nginx:
+  image: jwilder/nginx-proxy
+  ports:
+  - "80:80"
+  volumes:
+  - /var/run/docker.sock:/tmp/docker.sock
+  environment:
+  - LOG=true
+
+
+kibana:
+  image: ehazlett/kibana
+  environment:
+  - VIRTUAL_HOST=kibana.bluez.fi
+  ports:
+  - "80"
+  links:
+   - elasticsearch
+
+elasticsearch:
+  image: dockerfile/elasticsearch
+  ports:
+  - "9200:9200"
+  - "9300:9300"
+  volumes:
+  - elastic-data:/data 
+  command: /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml
+  environment:  
+  - LOG=true 
+
+logstash:
+  image: pblittle/docker-logstash
+  environment:
+  - ES_HOST=elasticsearch
+  - ES_PORT=9200
+  links:
+  - elasticsearch
+  ports:
+  - "9292:9292"
+
+fluentd:
+  build: ./fluentd
+  environment:
+  - ES_HOST=elasticsearch
+  - ES_PORT=9200
+  links:
+  - elasticsearch
+  volumes:
+  - /var/run/docker.sock:/tmp/docker.sock
+  - /var/lib/docker:/var/lib/docker 
+
+# sudo docker run   -e ES_HOST=elasticsearch   -e ES_PORT=9200   -p 9292:9292  --link  Harbour_elasticsearch_1:elasticsearch  pblittle/docker-logstash 
+
+#elk:
+#  image: willdurand/elk
+#  ports:
+#    - "80:80"
+#    - "XX.XX.XX.XX:5043:5043"
+#  volumes:
+#    - /path/to/your/ssl/files:/etc/ssl
+#    - /path/to/your/logstash/config:/etc/logstash
+#  volumes_from:
+#    - dataelk
+
+#dataelk:
+#  image: busybox
+#  volumes:
+#    - /data
+
+# https://github.com/shipyard/shipyard
+# django docker UI
+
+#deploy:
+#  image: shipyard/deploy
+#  command: start
+#  volumes:
+#  - /var/run/docker.sock:/var/run/docker.sock
+#  ports:
+#  - "8000:8000"
+
+
