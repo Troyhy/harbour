@@ -66,8 +66,8 @@ fluentd:
   - elasticsearch
   volumes:
   - /var/run/docker.sock:/tmp/docker.sock
-  - /var/lib/docker:/var/lib/docker 
-  - ./fluentd-data/config/fluentd.tmpl:/app/config/fluentd.tmpl
+  - /var/lib/docker:/var/lib/docker
+  - ./fluentd-data/config/:/app/config/
 # sudo docker run   -e ES_HOST=elasticsearch   -e ES_PORT=9200   -p 9292:9292  --link  Harbour_elasticsearch_1:elasticsearch  pblittle/docker-logstash 
 
 #elk:

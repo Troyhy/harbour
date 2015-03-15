@@ -18,7 +18,8 @@
   type docker_format
   docker_containers_path /var/lib/docker/containers
   container_id {{ $value.ID }}
-  tag docker.all
+  #tag parse.strip.docker.{{printf "%.*s" 12 $value.ID}}
+  tag raw.docker.{{printf "%.*s" 12 $value.ID}}
 </match>
 
 {{end}}{{ end }}
@@ -39,26 +40,39 @@
 #  add_tag_prefix stderr
 #</match>
 
-<match docker.all>
+<match raw.**>
     type color_stripper
-    tag  docker.all.stripped
-    strip_fields log
+    tag parse.docker
 </match>
 
-<match system.nginx.*>
-    type parser
-    format nginx
-    tag  nginx.access
-    key_name message
+
+<match parse.**>
+  type parser
+  key_name log
+  format multi_format
+  <pattern>
+    format /^[^"]*"(?<host>[^ ]*)" "(?<remote>[^ ]*)" "-" "(?<user>[^ ]*)" \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)";? "(?<agent>[^\"]*)")?$/
+  </pattern>
+  <pattern>
+    format json
+    time_key timestamp
+  </pattern>
+  <pattern>
+    format none
+  </pattern>
+  remove_prefix parse
 </match>
 
-<match docker.all.stripped>
+
+<match docker.**>
   type elasticsearch
   host {{ .Env.ES_HOST }}
   port {{ .Env.ES_PORT }}
   index_name docker
-  type_name stripped
+  type_name messages
   logstash_format true
+  include_tag_key true
+  flush_interval 10
 </match>
 
 <match system.**>
@@ -68,6 +82,7 @@
   index_name syslog
   type_name syslog
   logstash_format true
+  include_tag_key true
 </match>
 
 <match **>
@@ -75,6 +90,8 @@
   host {{ .Env.ES_HOST }}
   port {{ .Env.ES_PORT }}
   index_name docker
-  type_name fluentd
+  type_name catchall
+  class warn
   logstash_format true
+  include_tag_key true
 </match>
