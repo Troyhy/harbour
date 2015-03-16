@@ -28,34 +28,32 @@ logrotate:
   - LOG=true
 
 kibana:
-  image: ehazlett/kibana
+  build: ./docker-kibana
   environment:
   - VIRTUAL_HOST=kibana.bluez.fi
+  - KIBANA_SECURE=false
   ports:
   - "80"
   links:
-   - elasticsearch
+   - elasticsearch:es
 
 elasticsearch:
   image: dockerfile/elasticsearch
-  ports:
-  - "9200:9200"
-  - "9300:9300"
   volumes:
   - elastic-data:/data 
   command: /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml
-  environment:  
+  environment:
   - LOG=true 
 
-logstash:
-  image: pblittle/docker-logstash
+#logstash:
+#  image: pblittle/docker-logstash
 #  environment:
 #  - ES_HOST=elasticsearch
 #  - ES_PORT=9200
-  links:
-  - elasticsearch:es
-  ports:
-  - "9292:9292"
+#  links:
+#  - elasticsearch:es
+#  ports:
+#  - "9292:9292"
 
 fluentd:
   build: ./fluentd

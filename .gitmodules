@@ -7,3 +7,6 @@
 [submodule "logrotate"]
 	path = logrotate
 	url = git@github.com:Troyhy/logrotate.git
+[submodule "docker-kibana"]
+	path = docker-kibana
+	url = git@github.com:Troyhy/docker-kibana.git
