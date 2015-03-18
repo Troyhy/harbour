@@ -45,25 +45,14 @@ def _setup_path():
 def install_requirements(host_string):
     """Install docker & fig to host"""
     with settings(host_string=host_string):
-        # ============= DOCKER =============
-        # Add key
-        sudo('apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 '
-             '--recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9')
-        sudo('sh -c "echo deb https://get.docker.io/ubuntu docker main  '
-             '> /etc/apt/sources.list.d/docker.list"')
         # Update
-        print(green('Updating...'))
         with hide('output'):
             sudo('apt-get update')
-        # Install docker
-        print(green('Installing Docker...'))
-        with hide('output'):
-            sudo('apt-get install -y lxc-docker')
-
-        # ============= FIG =============
         # Make sure curl is installed
         sudo('apt-get install -y curl')
-        # Install fig
+        # Docker
+        sudo('curl -sSL https://get.docker.com/ | sh')
+        # Fig
         sudo('curl -L https://github.com/docker/fig/releases/download/1.0.1'
              '/fig-`uname -s`-`uname -m` > /usr/local/bin/fig; chmod +x '
              '/usr/local/bin/fig')
