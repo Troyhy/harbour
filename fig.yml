@@ -33,7 +33,8 @@ logrotate:
   - LOG=true
 
 kibana:
-  build: ./docker-kibana
+  image: balsamiq/docker-kibana
+  #build: ./docker-kibana
   environment:
   - VIRTUAL_HOST=kibana.bluez.fi
   - KIBANA_SECURE=false
