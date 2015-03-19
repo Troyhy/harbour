@@ -10,10 +10,15 @@
 nginx:
 #  image: jwilder/nginx-proxy
   build: ./nginx-proxy
+  privileged: true
   ports:
   - "80:80"
   volumes:
   - /var/run/docker.sock:/tmp/docker.sock
+  - ./nginx-data/htpasswd:/etc/nginx/htpasswd
+  - ./nginx-data/certs:/etc/nginx/certs
+  #- ./nginx-data/conf.d:/etc/nginx/conf.d
+  - ./nginx-data/vhost.d:/etc/nginx/vhost.d
   environment:
   - LOG=true
   links:
