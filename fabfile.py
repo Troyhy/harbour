@@ -34,8 +34,8 @@ env.RSYNC_EXCLUDE = [
 
 
 def _setup_path():
-    # /srv/staging
-    env.root = os.path.join(env.home, env.environment)
+    # /srv/
+    env.root = env.home
     # local directory where this file is
     env.local_path = os.path.dirname(__file__)
     # project directory
