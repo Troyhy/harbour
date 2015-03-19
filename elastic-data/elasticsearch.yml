@@ -1,7 +1,0 @@
-path:
-  logs: /data/log
-  data: /data/data
-
-http.cors.enabled: true
-http.cors.allow-origin: http://kibana.bluez.fi
-http.cors.allow-origin: http://192.168.0.52:9292
