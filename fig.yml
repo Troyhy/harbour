@@ -36,7 +36,7 @@ kibana:
   image: balsamiq/docker-kibana
   #build: ./docker-kibana
   environment:
-  - VIRTUAL_HOST=kibana.bluez.fi
+  - VIRTUAL_HOST=kibana.sta.designhouseilo.fi
   - KIBANA_SECURE=false
   ports:
   - "80"
@@ -46,7 +46,7 @@ kibana:
 elasticsearch:
   image: dockerfile/elasticsearch
   volumes:
-  - elastic-data:/data 
+  - ./elastic-data:/data
   command: /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml
   environment:
   - LOG=true 

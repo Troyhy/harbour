@@ -10,7 +10,7 @@ from fabric.colors import red, green
 
 PROJECT_FOLDER = basename(normpath(dirname(__file__)))
 PRODUCTION_SERVER = '127.0.0.1'
-STAGING_SERVER = '127.0.0.1'
+STAGING_SERVER = 'sta.designhouseilo.fi'
 
 VALID_HOSTS = ('staging',
                'production', )
@@ -164,11 +164,13 @@ def create_new_harbour(host):
                            default=False):
                 utils.abort('Deployment aborted.')
     # install docker and fig to host machine
-    install_requirements(host_string)
+    #install_requirements(host_string)
     # sync
     sync(host_string)
     # build container
     build_container(host_string)
+    # stop container
+    stop_container(host_string)
     # start container
     start_container(host_string)
     # show some info...
