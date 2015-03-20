@@ -69,6 +69,7 @@ def sync(host_string):
         sudo('mkdir -p %(root)s' % env)
         sudo('mkdir -p %(project_root)s' % env)
         sudo('chown -R %(user)s:%(user)s %(project_root)s' % env)
+        sudo('chmod -R g+rw %s' % env.project_root)
 
         # sync
         print(red("rsync starting"))
@@ -146,8 +147,9 @@ def show_version_info(host):
 
 
 @task
-def create_new_harbour(host):
+def create_new_harbour(host, **kwargs):
     """Create a new harbour to :host"""
+    ignore_requirements = kwargs.get('ignore_requirements', False)
     if host not in VALID_HOSTS:
         utils.abort('Please enter a valid host')
     env.user = SSH_USERNAME
@@ -163,8 +165,11 @@ def create_new_harbour(host):
     if not console.confirm('Continue?',
                            default=False):
                 utils.abort('Deployment aborted.')
+
     # install docker and fig to host machine
-    #install_requirements(host_string)
+    if not ignore_requirements:
+        install_requirements(host_string)
+
     # sync
     sync(host_string)
     # build container
