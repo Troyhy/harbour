@@ -12,6 +12,9 @@ PROJECT_FOLDER = basename(normpath(dirname(__file__)))
 PRODUCTION_SERVER = '127.0.0.1'
 STAGING_SERVER = 'sta.designhouseilo.fi'
 
+NGINX_DATA_DIR = '/srv/harbour/nginx-data'
+NGINX_HTPASSWD = os.path.join(NGINX_DATA_DIR, 'htpasswd')
+
 VALID_HOSTS = ('staging',
                'production', )
 
@@ -81,6 +84,9 @@ def sync(host_string):
             extra_opts=extra_opts,
         )
 
+        # htpasswd permissions...
+        sudo('chmod -R 777 %s' % NGINX_HTPASSWD)
+
 
 def build_container(host_string):
     # Run commands on host...
@@ -96,6 +102,30 @@ def build_container(host_string):
                           (host_string, env.project_root)))
                 utils.abort('Failed to build on %s' % env.environment)
             print(green('Build successful'))
+
+
+@task
+def container_status(host):
+    if host not in VALID_HOSTS:
+        utils.abort('Please enter a valid host')
+
+    if host == 'production':
+        host_string = PRODUCTION_SERVER
+    else:
+        host_string = STAGING_SERVER
+
+    _setup_path()
+    require('root')
+
+    with settings(host_string=host_string):
+        with cd(env.project_root):
+            print(green('Info about containers in %s:%s'
+                        % (host_string, env.project_root)))
+            with settings(warn_only=True):
+                r = run('fig ps')
+            if r.failed:
+                print(red('No containers found on %s:%s'
+                          % (host_string, env.project_root)))
 
 
 def stop_container(host_string):
@@ -130,6 +160,9 @@ def start_container(host_string):
 @task
 def show_version_info(host):
     """Show docker & fig versions installed on :host"""
+    if host not in VALID_HOSTS:
+        utils.abort('Please enter a valid host')
+
     if host == 'production':
         host_string = PRODUCTION_SERVER
     else:
@@ -180,6 +213,7 @@ def create_new_harbour(host, **kwargs):
     start_container(host_string)
     # show some info...
     show_version_info(host)
+    container_status(host)
 
 
 @task
