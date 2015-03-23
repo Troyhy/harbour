@@ -34,6 +34,8 @@ env.RSYNC_EXCLUDE = [
     '*.pyc',
     '*.py.ex',
     '*.example',
+    'elastic-data/data/*',
+    'elastic-data/log/*',
 ]
 
 
