@@ -9,7 +9,7 @@ from fabric.colors import red, green
 
 
 PROJECT_FOLDER = basename(normpath(dirname(__file__)))
-PRODUCTION_SERVER = '127.0.0.1'
+PRODUCTION_SERVER = 'pro.designhouseilo.fi'
 STAGING_SERVER = 'sta.designhouseilo.fi'
 
 NGINX_DATA_DIR = '/srv/harbour/nginx-data'
@@ -19,6 +19,7 @@ VALID_HOSTS = ('staging',
                'production', )
 
 env.home = '/srv/'
+env.docker_group = 'docker_adm'
 env.project = PROJECT_FOLDER
 
 SSH_USERNAME = None
@@ -54,7 +55,7 @@ def install_requirements(host_string):
         # Make sure curl is installed
         sudo('apt-get install -y curl')
         # Docker
-        sudo('curl -sSL https://get.docker.com/ | sh')
+        #sudo('curl -sSL https://get.docker.com/ | sh')
         # Fig
         sudo('curl -L https://github.com/docker/fig/releases/download/1.0.1'
              '/fig-`uname -s`-`uname -m` > /usr/local/bin/fig; chmod +x '
@@ -71,7 +72,7 @@ def sync(host_string):
         # dir
         sudo('mkdir -p %(root)s' % env)
         sudo('mkdir -p %(project_root)s' % env)
-        sudo('chown -R %(user)s:%(user)s %(project_root)s' % env)
+        sudo('chown -R %(user)s:%(docker_group)s %(project_root)s' % env)
         sudo('chmod -R g+rw %s' % env.project_root)
 
         # sync
