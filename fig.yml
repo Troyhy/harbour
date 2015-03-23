@@ -38,13 +38,16 @@ kibana:
   environment:
   - VIRTUAL_HOST=kibana.pro.designhouseilo.fi
   - KIBANA_SECURE=false
-  ports:
+  expose:
   - "80"
   links:
    - elasticsearch:es
 
 elasticsearch:
   image: dockerfile/elasticsearch
+  expose:
+  - "9200"
+  - "9300"
   volumes:
   - ./elastic-data:/data
   command: /elasticsearch/bin/elasticsearch -Des.config=/data/elasticsearch.yml
