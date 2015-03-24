@@ -182,7 +182,6 @@ def show_version_info(host):
         print('=======================================')
 
 
-
 @task
 def update_harbour(host, **kwargs):
     execute(create_new_harbour, host, ignore_requirements=True, **kwargs)

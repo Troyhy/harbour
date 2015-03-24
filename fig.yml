@@ -19,6 +19,7 @@ nginx:
   - ./nginx-data/certs:/etc/nginx/certs
   #- ./nginx-data/conf.d:/etc/nginx/conf.d
   - ./nginx-data/vhost.d:/etc/nginx/vhost.d
+  - ./nginx-data/error-pages:/usr/local/nginx/html
   environment:
   - LOG=true
   links:
