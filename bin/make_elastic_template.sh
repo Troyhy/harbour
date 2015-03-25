@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TODO: This has to be added to ES
-curl - XPOST http://172.17.0.190:9200/nginx* -d '\
+curl - XPOST http://es:9200/nginx* -d '\
 {
   "mappings": {
     "_default_": {
