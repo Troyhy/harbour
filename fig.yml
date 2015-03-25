@@ -17,11 +17,12 @@ nginx:
   - /var/run/docker.sock:/tmp/docker.sock
   - ./nginx-data/htpasswd:/etc/nginx/htpasswd
   - ./nginx-data/certs:/etc/nginx/certs
-  #- ./nginx-data/conf.d:/etc/nginx/conf.d
+  - ./nginx-data/nginx.conf:/etc/nginx/nginx.conf
   - ./nginx-data/vhost.d:/etc/nginx/vhost.d
   - ./nginx-data/error-pages:/usr/local/nginx/html
   environment:
   - LOG=true
+  - LOG_TAG=strip.parse.nginx.access
   links:
   - fluentd
 
@@ -37,7 +38,7 @@ kibana:
   image: balsamiq/docker-kibana
   #build: ./docker-kibana
   environment:
-  - VIRTUAL_HOST=kibana.pro.designhouseilo.fi
+  - VIRTUAL_HOST=kibana.sta.designhouseilo.fi
   - KIBANA_SECURE=false
   expose:
   - "80"
