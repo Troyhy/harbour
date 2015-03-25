@@ -3,5 +3,3 @@ path:
   data: /data/data
 
 http.cors.enabled: true
-http.cors.allow-origin: http://kibana.sta.designhouseilo.fi
-http.cors.allow-origin: http://192.168.0.52:9292
