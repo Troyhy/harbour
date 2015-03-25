@@ -18,8 +18,12 @@
   type docker_format
   docker_containers_path /var/lib/docker/containers
   container_id {{ $value.ID }}
-  #tag parse.strip.docker.{{printf "%.*s" 12 $value.ID}}
+  {{ $log_tag := $value.Env.LOG_TAG }}
+  tag {{ $log_tag }}
+  {{ if $log_tag }}
+  {{ else }}
   tag raw.docker.{{printf "%.*s" 12 $value.ID}}
+  {{ end }}
 </match>
 
 {{end}}{{ end }}
@@ -84,6 +88,46 @@
   logstash_format true
   include_tag_key true
 </match>
+
+
+
+# Nginx access log, should come in with strip.parse.nginx.access
+<match strip.parse.nginx.access>
+    type color_stripper
+    tag parse.nginx.access
+</match>
+
+<match parse.nginx.access>
+  type parser
+  key_name log
+  format multi_format
+  <pattern>
+    format /^(?<newfmt>)[^"]*"(?<host>[^ ]*)" "(?<remote>[^ ]*)" "-" "(?<user>[^ ]*)" \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*) +\S*)?" (?<code>[^ ]*) (?<size>[^ ]*) (?: "(?<referer>[^\"]*)";? "(?<agent>[^\"]*)")?$/
+    time_key @timestamp
+  </pattern>
+  <pattern>
+    format json
+    time_key timestamp
+  </pattern>
+  <pattern>
+    format none
+  </pattern>
+  remove_prefix parse
+</match>
+
+
+<match nginx.access>
+  type elasticsearch
+  host {{ .Env.ES_HOST }}
+  port {{ .Env.ES_PORT }}
+  index_name nginx
+  type_name access_log
+  logstash_format true
+  include_tag_key true
+  flush_interval 10
+  logstash_prefix nginx
+</match>
+
 
 <match **>
   type elasticsearch
