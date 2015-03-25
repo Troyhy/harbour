@@ -1,5 +1,5 @@
 ![nginx 1.7.8](https://img.shields.io/badge/nginx-1.7.8-brightgreen.svg)
-
+![Kibana Dashboard](https://raw.githubusercontent.com/Troyhy/harbour/master/fluentd-data/kibana_nginx_dash.jpg)
 Docker container runner with centralised logging and automated nginx proxy.
 
 This is collection of docker containers and configuration files to simplify running single host multidomain webserver.
