@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # TODO: This has to be added to ES
-docker run -it --link harbour_elasticsearch_1:es --entrypoint="/usr/bin/curl" harbour_fluentd:latest -XPOST 'http://es:9200/nginx-templ' -d \
+docker run -it --link harbour_elasticsearch_1:es --entrypoint="/usr/bin/curl" harbour_fluentd:latest -XPOST 'http://es:9200/_template/nginx_access' -d \
 '{
   "mappings": {
     "_default_": {
