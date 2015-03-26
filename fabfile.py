@@ -83,7 +83,7 @@ def sync(host_string):
             local_dir=env.local_path,
             remote_dir=env.root,
             exclude=env.RSYNC_EXCLUDE,
-            delete=True,
+            #delete=True,
             extra_opts=extra_opts,
         )
 
@@ -106,6 +106,21 @@ def build_container(host_string):
                 utils.abort('Failed to build on %s' % env.environment)
             print(green('Build successful'))
 
+
+def create_es_template(host_string):
+    # Run commands on host...
+    with settings(host_string=host_string):
+        # cd to project
+        with cd(env.project_root):
+            print(green('Creating ES index template on %s:%s' %
+                        (host_string, env.project_root)))
+            with settings(warn_only=True):
+                sudo('fig stop')
+                sudo('fig up -d elasticsearch && sleep 5')
+                with cd('bin'):
+                    sudo('./make_elastic_template.sh')
+                    sudo('./dashboard_load.sh')
+                sudo('fig stop')
 
 @task
 def container_status(host):
@@ -183,14 +198,21 @@ def show_version_info(host):
 
 
 @task
-def update_harbour(host, **kwargs):
-    execute(create_new_harbour, host, ignore_requirements=True, **kwargs)
+def update_harbour(host,
+                   ignore_requirements=True,
+                   create_index_template=False,
+                   **kwargs):
+    execute(create_new_harbour, host,
+            ignore_requirements=ignore_requirements,
+            create_index_template=create_index_template,
+            **kwargs)
 
 
 @task
-def create_new_harbour(host, **kwargs):
+def create_new_harbour(host,
+                       ignore_requirements=False,
+                       create_index_template=True, **kwargs):
     """Create a new harbour to :host"""
-    ignore_requirements = kwargs.get('ignore_requirements', False)
     if host not in VALID_HOSTS:
         utils.abort('Please enter a valid host')
     env.user = SSH_USERNAME
@@ -215,6 +237,8 @@ def create_new_harbour(host, **kwargs):
     sync(host_string)
     # build container
     build_container(host_string)
+    if create_index_template:
+        create_es_template(host_string)
     # stop container
     stop_container(host_string)
     # start container
