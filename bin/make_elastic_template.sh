@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # TODO: This has to be added to ES
-curl - XPOST http://es:9200/nginx* -d '\
-{
+docker run -it --link harbour_elasticsearch_1:es --entrypoint="/usr/bin/curl" harbour_fluentd:latest -XPOST 'http://es:9200/nginx-templ' -d \
+'{
   "mappings": {
     "_default_": {
       "_all": { "enabled": false },
@@ -23,5 +23,4 @@ curl - XPOST http://es:9200/nginx* -d '\
     }
   },
   "template": "nginx-*"
-}
-'
+}'
