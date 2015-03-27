@@ -38,7 +38,7 @@ kibana:
   image: balsamiq/docker-kibana
   #build: ./docker-kibana
   environment:
-  - VIRTUAL_HOST=kibana.sta.designhouseilo.fi
+  - VIRTUAL_HOST=kibana.*
   - KIBANA_SECURE=false
   expose:
   - "80"
