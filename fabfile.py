@@ -88,8 +88,13 @@ def sync(host_string):
             extra_opts=extra_opts,
         )
 
+
+        sudo('chown -R %(user)s:%(docker_group)s %(project_root)s' % env)
+        sudo('chmod -R o+r %s' % env.project_root)
+
         # htpasswd permissions...
         sudo('chmod -R 777 %s' % NGINX_HTPASSWD)
+
 
 
 def build_container(host_string):
