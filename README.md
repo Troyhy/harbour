@@ -36,3 +36,8 @@ This package gives you:
      `
      sudo docker run -e VIRTUAL_HOST=example.com -e LOG=true tutum/hello-world
      `
+
+#### Setting up ES tempaltes adn kibana Dashboard
+  This is bit tricky, but here is the procedure.
+  
+
