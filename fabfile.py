@@ -49,7 +49,7 @@ def _setup_path():
 
 
 def install_requirements(host_string):
-    """Install docker & fig to host"""
+    """Install docker & docker-compose to host"""
     with settings(host_string=host_string):
         # Update
         with hide('output'):
@@ -57,11 +57,12 @@ def install_requirements(host_string):
         # Make sure curl is installed
         sudo('apt-get install -y curl')
         # Docker
-        #sudo('curl -sSL https://get.docker.com/ | sh')
-        # Fig
-        sudo('curl -L https://github.com/docker/fig/releases/download/1.0.1'
-             '/fig-`uname -s`-`uname -m` > /usr/local/bin/fig; chmod +x '
-             '/usr/local/bin/fig')
+        sudo('curl -sSL https://get.docker.com/ | sh')
+        # Docker-compose
+        sudo('curl -L https://github.com/docker/compose/releases/download/'
+             '1.1.0/docker-compose-`uname -s`-`uname -m` > '
+             '/usr/local/bin/docker-compose')
+        sudo('chmod +x /usr/local/bin/docker-compose')
 
 
 def sync(host_string):
@@ -99,7 +100,7 @@ def build_container(host_string):
             print(green('Start building container on %s:%s' %
                         (host_string, env.project_root)))
             with settings(warn_only=True):
-                build = sudo('fig build')
+                build = sudo('docker-compose build')
             if build.failed:
                 print(red('Build failed on %s:%s' %
                           (host_string, env.project_root)))
@@ -115,12 +116,12 @@ def create_es_template(host_string):
             print(green('Creating ES index template on %s:%s' %
                         (host_string, env.project_root)))
             with settings(warn_only=True):
-                sudo('fig stop')
-                sudo('fig up -d elasticsearch && sleep 5')
+                sudo('docker-compose stop')
+                sudo('docker-compose up -d elasticsearch && sleep 5')
                 with cd('bin'):
                     sudo('./make_elastic_template.sh')
                     sudo('./dashboard_load.sh')
-                sudo('fig stop')
+                sudo('docker-compose stop')
 
 @task
 def container_status(host):
@@ -140,7 +141,7 @@ def container_status(host):
             print(green('Info about containers in %s:%s'
                         % (host_string, env.project_root)))
             with settings(warn_only=True):
-                r = run('fig ps')
+                r = run('docker-compose ps')
             if r.failed:
                 print(red('No containers found on %s:%s'
                           % (host_string, env.project_root)))
@@ -153,10 +154,10 @@ def stop_container(host_string):
         with cd(env.project_root):
             # Ask nicely for container to stop
             with settings(warn_only=True):
-                stop = sudo('fig stop')
+                stop = sudo('docker-compose stop')
             # It's not listening! We have to kill it!
             if stop.failed:
-                sudo('fig kill')
+                sudo('docker-compose kill')
 
             print(green('Containers stopped'))
 
@@ -167,7 +168,7 @@ def start_container(host_string):
         # cd to project
         with cd(env.project_root):
             with settings(warn_only=True):
-                start = sudo('fig up -d')
+                start = sudo('docker-compose up -d')
             if start.failed:
                 print(red('Containers failed to start on %s:%s' %
                           (host_string, env.project_root)))
@@ -177,7 +178,7 @@ def start_container(host_string):
 
 @task
 def show_version_info(host):
-    """Show docker & fig versions installed on :host"""
+    """Show docker & docker-compose versions installed on :host"""
     if host not in VALID_HOSTS:
         utils.abort('Please enter a valid host')
 
@@ -189,10 +190,10 @@ def show_version_info(host):
     with settings(host_string=host_string):
         with hide('output'):
             d = sudo('docker version')
-            f = sudo('fig --version')
+            f = sudo('docker-compose --version')
         print('==============  DOCKER  ===============')
         print(green('%s' % d))
-        print('==============    FIG    ==============')
+        print('============ DOCKER-COMPOSE ===========')
         print(green('%s' % f))
         print('=======================================')
 
@@ -229,7 +230,7 @@ def create_new_harbour(host,
                            default=False):
                 utils.abort('Deployment aborted.')
 
-    # install docker and fig to host machine
+    # install docker and docker-compose to host machine
     if not ignore_requirements:
         install_requirements(host_string)
 
@@ -268,7 +269,7 @@ def container_status(host):
             print(green('Info about containers in %s:%s'
                         % (host_string, env.project_root)))
             with settings(warn_only=True):
-                r = run('fig ps')
+                r = run('docker-compose ps')
             if r.failed:
                 print(red('No containers found on %s:%s'
                           % (host_string, env.project_root)))
