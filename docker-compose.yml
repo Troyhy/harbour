@@ -20,6 +20,7 @@ nginx:
   - ./nginx-data/nginx.conf:/etc/nginx/nginx.conf
   - ./nginx-data/vhost.d:/etc/nginx/vhost.d
   - ./nginx-data/error-pages:/usr/local/nginx/html
+  - ./nginx-data/conf.d/qri.fi.conf:/etc/nginx/conf.d/qri.fi.conf
   environment:
   - LOG=true
   - LOG_TAG=strip.parse.nginx.access
