@@ -46,7 +46,7 @@ kibana:
    - elasticsearch:es
 
 elasticsearch:
-  image: dockerfile/elasticsearch
+  image: library/elasticsearch
   expose:
   - "9200"
   - "9300"

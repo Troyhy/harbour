@@ -9,8 +9,8 @@ from fabric.colors import red, green
 
 
 PROJECT_FOLDER = basename(normpath(dirname(__file__)))
-PRODUCTION_SERVER = 'pro.designhouseilo.fi'
-STAGING_SERVER = 'sta.designhouseilo.fi'
+PRODUCTION_SERVER = 'fsecure.packagemedia.fi'
+STAGING_SERVER = 'fsecure.packagemedia.fi'
 
 NGINX_DATA_DIR = '/srv/harbour/nginx-data'
 NGINX_HTPASSWD = os.path.join(NGINX_DATA_DIR, 'htpasswd')
@@ -55,6 +55,8 @@ def install_requirements(host_string):
         # Update
         with hide('output'):
             sudo('apt-get update')
+
+
         # Make sure curl is installed
         sudo('apt-get install -y curl')
         # Docker
